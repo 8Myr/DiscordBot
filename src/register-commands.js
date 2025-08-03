@@ -7,6 +7,32 @@ const commands = [
         description: 'Replies with hey !',
     },
     {
+        name: 'embed',
+        description: 'Sends an embed !',
+        options: [
+            {
+                name: 'title',
+                description: 'The Title.',
+                type: ApplicationCommandOptionType.String,
+                required: true,
+            },
+            {
+                name: 'description',
+                description: 'The Descrition.',
+                type: ApplicationCommandOptionType.String,
+                required: true,
+            },
+            {
+                name: 'gifimage',
+                description: 'Gif or Image.',
+                type: ApplicationCommandOptionType.String,
+                required: false,
+            },
+
+        ],
+        required: true,
+    },
+    {
         name: 'ping',
         description: 'Replies with Pong !',
     },
@@ -28,6 +54,7 @@ const commands = [
             },
         ],
     },
+
     
 ];
 

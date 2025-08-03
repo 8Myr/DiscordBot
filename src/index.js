@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField } = require('discord.js')
+const { Client, IntentsBitField, EmbedBuilder } = require('discord.js')
 
 const client = new Client({
     intents: [
@@ -40,6 +40,21 @@ client.on('interactionCreate', (interaction) => {
         } else {
             interaction.reply('Please provide two numbers.');
         }
+    }
+    if (interaction.commandName === 'embed') {
+        const embedTitle = interaction.options.getString('title');
+        const embedDesc = interaction.options.getString('description');
+        const embedUrl = interaction.options.getString('gifimage');
+        const embed = new EmbedBuilder()
+
+            .setTitle(`${embedTitle}`)
+            .setDescription(`${embedDesc}`)
+            .setColor('Random')
+            .setImage(`${embedUrl}`)
+            .setTimestamp()
+            // Look documentation for more at https://discord.js.org/docs/packages/discord.js/14.21.0/Embed:Class
+    
+        interaction.reply({ embeds: [embed] });
     }
 });
 
