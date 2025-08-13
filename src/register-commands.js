@@ -7,6 +7,18 @@ const commands = [
         description: 'Replies with hey !',
     },
     {
+        name: 'ask',
+        description: 'Ask something to Gemini.',
+        options: [
+            {
+                name: 'question',
+                description: 'The question you want to ask to AI',
+                type: ApplicationCommandOptionType.String,
+                required: true,
+            },
+        ]
+    },
+    {
         name: 'embed',
         description: 'Sends an embed !',
         options: [
@@ -54,8 +66,6 @@ const commands = [
             },
         ],
     },
-
-    
 ];
 
 const rest = new REST({ version: '10'}).setToken(process.env.DISCORD_BOT_TOKEN);

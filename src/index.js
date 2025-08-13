@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { Client, IntentsBitField, EmbedBuilder, ActivityType } = require('discord.js')
+const { Client, IntentsBitField, EmbedBuilder, ActivityType, channelLink } = require('discord.js')
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const client = new Client({
     intents: [
@@ -9,6 +10,8 @@ const client = new Client({
         IntentsBitField.Flags.MessageContent,
     ],
 });
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 client.on('ready', (c) => {
     console.log(`${c.user.tag} is ready !`)
@@ -58,6 +61,26 @@ client.on('interactionCreate', async (interaction) => {
                 return interaction.reply('Please provide two numbers.');
             }
         }
+        // aistudio.google.com
+        if (interaction.commandName === 'ask') {
+            const question = interaction.options.getString('question');
+            try {
+                const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+                const prompt = "Answer to the question but you have to be short enough: " + question;
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                let text = response.text();
+                if (text.length > 2000) text = text.slice(0, 1997) + '...';
+                await interaction.reply(text);
+            } catch (error) {
+                console.error(error);
+                if (!interaction.replied) {
+                    await interaction.reply({ content: "❗ Une erreur est survenue lors de la génération de la réponse. Merci de réessayer plus tard.", ephemeral: true });
+                } else {
+                    await interaction.followUp({ content: "❗ Une erreur est survenue lors de la génération de la réponse. Merci de réessayer plus tard.", ephemeral: true });
+                }
+            }
+        }
         if (interaction.commandName === 'embed') {
             const embedTitle = interaction.options.getString('title');
             const embedDesc = interaction.options.getString('description');
@@ -99,6 +122,26 @@ client.on('interactionCreate', async (interaction) => {
             });
         } catch (error) {
             console.log(error);
+        }
+    }
+});
+
+process.on('unhandledRejection', async (error) => {
+    console.error('An error has been detected :', error);
+    if (client.readyAt) {
+        const channel = await client.channels.fetch('1391784224960544789').catch(() => null); // Channel log Bot
+        if (channel && channel.isTextBased()) {
+            channel.send(`An error has been detected :\n\`\`\`${error}\`\`\``);
+        }
+    }
+});
+
+process.on('uncaughtException', async (error) => {
+    console.error('An exception was detected :', error);
+    if (client.readyAt) {
+        const channel = await client.channels.fetch('1391784224960544789').catch(() => null);   // Channel log Bot
+        if (channel && channel.isTextBased()) {
+            channel.send(`An exception was detected :\n\`\`\`${error}\`\`\``);
         }
     }
 });
